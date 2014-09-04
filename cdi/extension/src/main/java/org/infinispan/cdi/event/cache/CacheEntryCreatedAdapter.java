@@ -16,6 +16,59 @@ import javax.enterprise.util.TypeLiteral;
 @Listener
 public class CacheEntryCreatedAdapter<K, V> extends AbstractAdapter<CacheEntryCreatedEvent<K, V>> {
 
+   protected class CDICacheEntryCreatedEvent implements CacheEntryCreatedEvent<K, V> {
+      private CacheEntryCreatedEvent<K, V> decoratedEvent;
+
+      CDICacheEntryCreatedEvent(CacheEntryCreatedEvent<K, V> decoratedEvent) {
+         this.decoratedEvent = decoratedEvent;
+      }
+
+      @Override
+      public V getValue() {
+         return decoratedEvent.getValue();
+      }
+
+      @Override
+      public boolean isCommandRetried() {
+         return decoratedEvent.isCommandRetried();
+      }
+
+      @Override
+      public K getKey() {
+         return decoratedEvent.getKey();
+      }
+
+      @Override
+      public Metadata getMetadata() {
+         return decoratedEvent.getMetadata();
+      }
+
+      @Override
+      public GlobalTransaction getGlobalTransaction() {
+         return decoratedEvent.getGlobalTransaction();
+      }
+
+      @Override
+      public boolean isOriginLocal() {
+         return decoratedEvent.isOriginLocal();
+      }
+
+      @Override
+      public Type getType() {
+         return decoratedEvent.getType();
+      }
+
+      @Override
+      public boolean isPre() {
+         return decoratedEvent.isPre();
+      }
+
+      @Override
+      public Cache getCache() {
+         return decoratedEvent.getCache();
+      }
+   }
+
    public static final CacheEntryCreatedEvent<?, ?> EMPTY = new CacheEntryCreatedEvent<Object, Object>() {
 
       @Override
@@ -76,6 +129,6 @@ public class CacheEntryCreatedAdapter<K, V> extends AbstractAdapter<CacheEntryCr
    @Override
    @CacheEntryCreated
    public void fire(CacheEntryCreatedEvent<K, V> payload) {
-      super.fire(payload);
+      super.fire(new CDICacheEntryCreatedEvent(payload));
    }
 }

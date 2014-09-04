@@ -1,9 +1,9 @@
 package org.infinispan.cdi.test.event;
 
+import org.infinispan.notifications.cachelistener.event.CacheEntryActivatedEvent;
 import org.infinispan.notifications.cachelistener.event.CacheEntryCreatedEvent;
 import org.infinispan.notifications.cachelistener.event.CacheEntryRemovedEvent;
 import org.infinispan.notifications.cachemanagerlistener.event.CacheStartedEvent;
-import org.infinispan.notifications.cachemanagerlistener.event.CacheStoppedEvent;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -14,86 +14,46 @@ import javax.enterprise.event.Observes;
 @ApplicationScoped
 public class Cache1Observers {
 
-   private CacheStartedEvent cacheStartedEvent;
-   private int cacheStartedEventCount;
+   CacheObserverEvents eventsMap = new CacheObserverEvents();
 
-   private int cacheStoppedEventCount;
-   private CacheStoppedEvent cacheStoppedEvent;
-
-   private int cacheEntryCreatedEventCount;
-   private CacheEntryCreatedEvent cacheEntryCreatedEvent;
-
-   private int cacheEntryRemovedEventCount;
-   private CacheEntryRemovedEvent cacheEntryRemovedEvent;
-
-   /**
-    * Observe the cache started event for the cache associated with @Cache1
-    */
-   void observeCacheStarted(@Observes @Cache1 CacheStartedEvent event) {
-      this.cacheStartedEventCount++;
-      this.cacheStartedEvent = event;
+   void observeCache1CacheStatedEvent(@Observes @Cache1 CacheStartedEvent event) {
+      eventsMap.addEvent(Cache1.class, CacheStartedEvent.class, event);
    }
 
-   /**
-    * Observe the cache stopped event for the cache associated with @Cache1
-    */
-   void observeCacheStopped(@Observes @Cache1 CacheStoppedEvent event) {
-      this.cacheStoppedEventCount++;
-      this.cacheStoppedEvent = event;
+   void observeCache2CacheStatedEvent(@Observes @Cache2 CacheStartedEvent event) {
+      eventsMap.addEvent(Cache2.class, CacheStartedEvent.class, event);
    }
 
-   /**
-    * <p>Observe the cache entry created event for the cache associated with @Cache1</p>
-    *
-    * <p>Get's called once (before) with pre false, once (after) with pre true</p>
-    */
-   void observeCacheEntryCreated(@Observes @Cache1 CacheEntryCreatedEvent event) {
-      if (!event.isPre()) {
-         this.cacheEntryCreatedEventCount++;
-         this.cacheEntryCreatedEvent = event;
-      }
+   void observeCache1CacheEntryCreatedEvent(@Observes @Cache1 CacheEntryCreatedEvent event) {
+      eventsMap.addEvent(Cache1.class, CacheEntryCreatedEvent.class, event);
    }
 
-   /**
-    * Observe the cache entry removed event for the cache associated with @Cache1
-    */
-   void observeCacheEntryRemoved(@Observes @Cache1 CacheEntryRemovedEvent event) {
-      if (event.isPre()) {
-         this.cacheEntryRemovedEventCount++;
-         this.cacheEntryRemovedEvent = event;
-      }
+   void observeCache2CacheEntryCreatedEvent(@Observes @Cache2 CacheEntryCreatedEvent event) {
+      eventsMap.addEvent(Cache2.class, CacheEntryCreatedEvent.class, event);
    }
 
-   public CacheStartedEvent getCacheStartedEvent() {
-      return cacheStartedEvent;
+   void observeCache1CacheEntryRemovedEvent(@Observes @Cache1 CacheEntryRemovedEvent event) {
+      eventsMap.addEvent(Cache1.class, CacheEntryRemovedEvent.class, event);
    }
 
-   public int getCacheStartedEventCount() {
-      return cacheStartedEventCount;
+   void observeCache2CacheEntryRemovedEvent(@Observes @Cache2 CacheEntryRemovedEvent event) {
+      eventsMap.addEvent(Cache2.class, CacheEntryRemovedEvent.class, event);
    }
 
-   public CacheStoppedEvent getCacheStoppedEvent() {
-      return cacheStoppedEvent;
+   void observeCache1CacheEntryActivatedEvent(@Observes @Cache1 CacheEntryActivatedEvent event) {
+      eventsMap.addEvent(Cache1.class, CacheEntryActivatedEvent.class, event);
    }
 
-   public int getCacheStoppedEventCount() {
-      return cacheStoppedEventCount;
+   void observeCache2CacheEntryActivatedEvent(@Observes @Cache2 CacheEntryActivatedEvent event) {
+      eventsMap.addEvent(Cache2.class, CacheEntryActivatedEvent.class, event);
    }
 
-   public CacheEntryCreatedEvent getCacheEntryCreatedEvent() {
-      return cacheEntryCreatedEvent;
+
+   public CacheObserverEvents getEventsMap() {
+      return eventsMap;
    }
 
-   public int getCacheEntryCreatedEventCount() {
-      return cacheEntryCreatedEventCount;
+   public void clear() {
+      eventsMap.clear();
    }
-
-   public CacheEntryRemovedEvent getCacheEntryRemovedEvent() {
-      return cacheEntryRemovedEvent;
-   }
-
-   public int getCacheEntryRemovedEventCount() {
-      return cacheEntryRemovedEventCount;
-   }
-
 }

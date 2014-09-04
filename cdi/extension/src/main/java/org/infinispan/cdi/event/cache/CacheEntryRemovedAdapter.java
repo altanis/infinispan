@@ -16,6 +16,64 @@ import javax.enterprise.util.TypeLiteral;
 @Listener
 public class CacheEntryRemovedAdapter<K, V> extends AbstractAdapter<CacheEntryRemovedEvent<K, V>> {
 
+   protected class CDICacheEntryRemovedEvent implements CacheEntryRemovedEvent<K, V> {
+      private CacheEntryRemovedEvent<K, V> decoratedEvent;
+
+      CDICacheEntryRemovedEvent(CacheEntryRemovedEvent<K, V> decoratedEvent) {
+         this.decoratedEvent = decoratedEvent;
+      }
+
+      @Override
+      public V getValue() {
+         return decoratedEvent.getValue();
+      }
+
+      @Override
+      public V getOldValue() {
+         return decoratedEvent.getOldValue();
+      }
+
+      @Override
+      public boolean isCommandRetried() {
+         return decoratedEvent.isCommandRetried();
+      }
+
+      @Override
+      public K getKey() {
+         return decoratedEvent.getKey();
+      }
+
+      @Override
+      public Metadata getMetadata() {
+         return decoratedEvent.getMetadata();
+      }
+
+      @Override
+      public GlobalTransaction getGlobalTransaction() {
+         return decoratedEvent.getGlobalTransaction();
+      }
+
+      @Override
+      public boolean isOriginLocal() {
+         return decoratedEvent.isOriginLocal();
+      }
+
+      @Override
+      public Type getType() {
+         return decoratedEvent.getType();
+      }
+
+      @Override
+      public boolean isPre() {
+         return decoratedEvent.isPre();
+      }
+
+      @Override
+      public Cache<K, V> getCache() {
+         return decoratedEvent.getCache();
+      }
+   }
+
    public static final CacheEntryRemovedEvent<?, ?> EMPTY = new CacheEntryRemovedEvent<Object, Object>() {
 
       @Override
@@ -81,6 +139,6 @@ public class CacheEntryRemovedAdapter<K, V> extends AbstractAdapter<CacheEntryRe
    @Override
    @CacheEntryRemoved
    public void fire(CacheEntryRemovedEvent<K, V> payload) {
-      super.fire(payload);
+      super.fire(new CDICacheEntryRemovedEvent(payload));
    }
 }

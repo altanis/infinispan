@@ -5,6 +5,7 @@
       xmlns="urn:infinispan:config:7.0">
 
    <cache-container default-cache="default">
+       <jmx domain="org.infinispan" duplicate-domains="true"/>
       <local-cache name="default">
          <eviction max-entries="1000" />
       </local-cache>

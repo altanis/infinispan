@@ -18,16 +18,19 @@ public final class Deployments {
     * The base deployment web archive. The CDI extension is packaged as an individual jar.
     */
    public static WebArchive baseDeployment() {
-      return ShrinkWrap.create(WebArchive.class, "test.war")
+      JavaArchive cdiArchive = ShrinkWrap.create(JavaArchive.class, "infinispan-cdi.jar")
+            .addPackage(ConfigureCache.class.getPackage())
+            .addPackage(AbstractEventBridge.class.getPackage())
+            .addPackage(CacheEventBridge.class.getPackage())
+            .addPackage(CacheManagerEventBridge.class.getPackage())
+            .addAsManifestResource(ConfigureCache.class.getResource("/META-INF/beans.xml"), "beans.xml")
+            .addAsManifestResource(ConfigureCache.class.getResource("/META-INF/services/javax.enterprise.inject.spi.Extension"), "services/javax.enterprise.inject.spi.Extension");
+      WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war")
             .addAsWebInfResource(Deployments.class.getResource("/beans.xml"), "beans.xml")
-            .addAsLibrary(
-                  ShrinkWrap.create(JavaArchive.class, "infinispan-cdi.jar")
-                        .addPackage(ConfigureCache.class.getPackage())
-                        .addPackage(AbstractEventBridge.class.getPackage())
-                        .addPackage(CacheEventBridge.class.getPackage())
-                        .addPackage(CacheManagerEventBridge.class.getPackage())
-                        .addAsManifestResource(ConfigureCache.class.getResource("/META-INF/beans.xml"), "beans.xml")
-                        .addAsManifestResource(ConfigureCache.class.getResource("/META-INF/services/javax.enterprise.inject.spi.Extension"), "services/javax.enterprise.inject.spi.Extension")
-            );
+            .addAsLibrary(cdiArchive)
+            .addAsResource(Deployments.class.getResource("/infinispan.xml"), "infinispan.xml");
+      System.out.println(archive.toString(true));
+      System.out.println(cdiArchive.toString(true));
+      return archive;
    }
 }
